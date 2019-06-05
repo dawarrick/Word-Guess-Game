@@ -12,7 +12,7 @@ var wins = 0,
   wrongGuesses = 0,
   firstTime = true,
   wordList = ["BUDWEISER", "LEGEND", "CORONA", "MICHELOB", "MILLER", "CHEDDAR", "GOUDA", "PROVOLONE", "ASIAGO", "MUENSTER",
-    "PEPPERONI", "SAUSAGE", "ONION", "BACON", "JALAPENO,", "MARGARITA", "COSMOPOLITAN", "MARTINI", "DAIQUIRI", "MUDSLIDE"];
+    "PEPPERONI", "SAUSAGE", "ONION", "BACON", "JALAPENO", "MARGARITA", "COSMOPOLITAN", "MARTINI", "DAIQUIRI", "MUDSLIDE"];
 
 // Create variables that hold references to the places in the HTML where we want to display things.
 var directionsText = document.getElementById("directions-text");
@@ -101,15 +101,7 @@ function getWord(alist, sequence, increment) {
   }
 }
 
-// This function is run whenever the user presses a key
-document.onkeyup = function (event) {
-
-  // Determines which key was pressed.
-
-  var userGuess = event.key;
-  userGuess = userGuess.toUpperCase();
-  //if the current word is null, initilize everything
-  if (displayWordArray.length < 1) {
+function initializeGame() {
     //get a word
     wordIndex = getWord(wordList, wordIndex, increment);
     wrongGuesses = 0;
@@ -117,14 +109,37 @@ document.onkeyup = function (event) {
     displayWordArray = currentWord.slice();   //duplicate the word array
     displayWordArray.fill("_");   //replace all values with _
     displayWord = getDisplayWord(displayWordArray); //convert array to word for displaying
-
-
     gameStatus = "";
-   
-  }
+    return true;
+}
+  // Display the user and computer guesses, and wins/losses/ties.
+function updateDisplay() {
+  //directionsText.textContent = "Press any key to get ";
+  userChoiceText.textContent = "Wrong Guesses Remaining: " + (guessesAllowed-wrongGuesses);
+  currentWordText.textContent = "Word to Guess: " + displayWord;
+  guessedText.textContent = "Letters Guessed: " + getDisplayWord(guessed);
+  winsText.textContent = "wins: " + wins;
+  lossesText.textContent = "losses: " + losses;
+  gameStatusText.textContent = "Guess Results: " + gameStatus;
+  return true;
+}
+
+var returnValue = true;
+returnValue = (initializeGame());
+returnValue = (updateDisplay());
+
+// This function is run whenever the user presses a key
+document.onkeyup = function (event) {
+  
+  // Determines which key was pressed.
+
+  var userGuess = event.key;
+  userGuess = userGuess.toUpperCase();
+  //if the current word is null, initilize everything
+
   
   //if it's the first game first keystroke, don't process the letter.
-  if (!firstTime) {
+//  if (!firstTime) {
     if (!isLetter(userGuess)) {
       gameStatus = "Guess a letter dummy";
     }
@@ -151,17 +166,16 @@ document.onkeyup = function (event) {
       guessed = [];
       wins++;
     }
-  }
-  else {
-    firstTime = false;
-  }
+ 
+  returnValue = (updateDisplay());
 
-  // Display the user and computer guesses, and wins/losses/ties.
-  directionsText.textContent = "";
-  //userChoiceText.textContent = "You chose: " + userGuess;
-  currentWordText.textContent = "Word to Guess: " + displayWord;
-  guessedText.textContent = "Letters Guessed: " + getDisplayWord(guessed);
-  winsText.textContent = "wins: " + wins;
-  lossesText.textContent = "losses: " + losses;
   gameStatusText.textContent = "Game Status: " + gameStatus;
+  
+  if (displayWordArray.length < 1) {
+    //get a new word
+    returnValue = (initializeGame());
+    directionsText.textContent = "Press any key to start a new game ";
+  }
+  
+ 
 };
